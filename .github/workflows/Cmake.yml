@@ -1,4 +1,4 @@
-name: C++ Google Test Pipeline
+name: C++ Coverage Report
 
 on:
   push:
@@ -7,25 +7,51 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build-and-test:
+  build-test-coverage:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout Code
       uses: actions/checkout@v3
 
-    # Step 1: Configure
-    # Instead of "mkdir build" and "cd build", we use "-B build"
-    # This automatically creates the folder and runs cmake inside it.
-    - name: Configure CMake
-      run: cmake -B build
+    # 1. Install Dependencies
+    # We need 'lcov' to generate the HTML report
+    - name: Install LCOV
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y lcov
 
-    # Step 2: Build (Make)
-    # We tell cmake to build the project located in the "build" folder
+    # 2. Configure CMake with Coverage Flags
+    # We add "-DCMAKE_CXX_FLAGS=--coverage" to tell the compiler to track code usage.
+    # We add "-DCMAKE_BUILD_TYPE=Debug" because coverage works best in Debug mode.
+    - name: Configure CMake
+      run: cmake -B build -DCMAKE_CXX_FLAGS="--coverage" -DCMAKE_EXE_LINKER_FLAGS="--coverage" -DCMAKE_BUILD_TYPE=Debug
+
+    # 3. Build the Code
     - name: Build
       run: cmake --build build
 
-    # Step 3: Run Tests
-    # We run the executable directly from the build folder
+    # 4. Run the Tests
+    # This generates the raw .gcda data files
     - name: Run Tests
       run: ./build/run_tests
+
+    # 5. Generate Coverage Report
+    - name: Generate LCOV Report
+      run: |
+        # Capture coverage data from the 'build' directory
+        lcov --capture --directory build --output-file coverage.info
+        
+        # Remove clutter (we don't want coverage for Google Test or system files)
+        lcov --remove coverage.info '/usr/*' '*/_deps/*' --output-file coverage_filtered.info
+        
+        # Generate the HTML report in a folder named 'coverage_report'
+        genhtml coverage_filtered.info --output-directory coverage_report
+
+    # 6. Upload Report as Artifact
+    # This allows you to download the HTML files from GitHub after the run finishes
+    - name: Upload Coverage Report
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-report
+        path: coverage_report
