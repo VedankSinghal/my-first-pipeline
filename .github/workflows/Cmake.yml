@@ -19,5 +19,7 @@ jobs:
     # Step 2: Configure CMake
     # IMPORTANT: This step reads your CMakeLists.txt and 
     # automatically downloads Google Test from the internet.
-    - name: Configure CMake
+    - name: Configure CMake    
+      run: chmod +xbuildTesh.sh
+    - name: Configure CMake    
       run: sudo ./buildTest.sh
