@@ -8,18 +8,24 @@ on:
 
 jobs:
   build-and-test:
-    # We use Ubuntu because it has g++ and CMake pre-installed
     runs-on: ubuntu-latest
 
     steps:
-    # Step 1: Check out your code from the repository
     - name: Checkout Code
       uses: actions/checkout@v3
 
-    # Step 2: Configure CMake
-    # IMPORTANT: This step reads your CMakeLists.txt and 
-    # automatically downloads Google Test from the internet.
-    - name: Configure CMake    
-      run: chmod +x buildTest.sh
-    - name: Configure CMake    
-      run: sudo ./buildTest.sh
+    # Step 1: Configure
+    # Instead of "mkdir build" and "cd build", we use "-B build"
+    # This automatically creates the folder and runs cmake inside it.
+    - name: Configure CMake
+      run: cmake -B build
+
+    # Step 2: Build (Make)
+    # We tell cmake to build the project located in the "build" folder
+    - name: Build
+      run: cmake --build build
+
+    # Step 3: Run Tests
+    # We run the executable directly from the build folder
+    - name: Run Tests
+      run: ./build/run_tests
