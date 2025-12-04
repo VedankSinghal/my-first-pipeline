@@ -12,46 +12,38 @@ jobs:
 
     steps:
     - name: Checkout Code
+      # CHANGED: Updated from v3 to v4
       uses: actions/checkout@v4
 
-    # 1. Install Dependencies
-    # We need 'lcov' to generate the HTML report
     - name: Install LCOV
       run: |
         sudo apt-get update
         sudo apt-get install -y lcov
 
-    # 2. Configure CMake with Coverage Flags
-    # We add "-DCMAKE_CXX_FLAGS=--coverage" to tell the compiler to track code usage.
-    # We add "-DCMAKE_BUILD_TYPE=Debug" because coverage works best in Debug mode.
     - name: Configure CMake
+      # We add "-DCMAKE_CXX_FLAGS=--coverage" to track code usage
       run: cmake -B build -DCMAKE_CXX_FLAGS="--coverage" -DCMAKE_EXE_LINKER_FLAGS="--coverage" -DCMAKE_BUILD_TYPE=Debug
 
-    # 3. Build the Code
     - name: Build
       run: cmake --build build
 
-    # 4. Run the Tests
-    # This generates the raw .gcda data files
     - name: Run Tests
       run: ./build/run_tests
 
-    # 5. Generate Coverage Report
     - name: Generate LCOV Report
       run: |
-        # Capture coverage data from the 'build' directory
+        # 1. Capture the data
         lcov --capture --directory build --output-file coverage.info
         
-        # Remove clutter (we don't want coverage for Google Test or system files)
+        # 2. Remove clutter (system files and Google Test library code)
         lcov --remove coverage.info '/usr/*' '*/_deps/*' --output-file coverage_filtered.info
         
-        # Generate the HTML report in a folder named 'coverage_report'
+        # 3. Generate HTML
         genhtml coverage_filtered.info --output-directory coverage_report
 
-    # 6. Upload Report as Artifact
-    # This allows you to download the HTML files from GitHub after the run finishes
     - name: Upload Coverage Report
-      uses: actions/upload-artifact@v3
+      # CHANGED: Updated from v3 to v4 (This fixes your error)
+      uses: actions/upload-artifact@v4
       with:
         name: coverage-report
         path: coverage_report
