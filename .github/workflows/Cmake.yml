@@ -12,7 +12,6 @@ jobs:
 
     steps:
     - name: Checkout Code
-      # CHANGED: Updated from v3 to v4
       uses: actions/checkout@v4
 
     - name: Install LCOV
@@ -21,7 +20,6 @@ jobs:
         sudo apt-get install -y lcov
 
     - name: Configure CMake
-      # We add "-DCMAKE_CXX_FLAGS=--coverage" to track code usage
       run: cmake -B build -DCMAKE_CXX_FLAGS="--coverage" -DCMAKE_EXE_LINKER_FLAGS="--coverage" -DCMAKE_BUILD_TYPE=Debug
 
     - name: Build
@@ -32,17 +30,16 @@ jobs:
 
     - name: Generate LCOV Report
       run: |
-        # 1. Capture the data
-        lcov --capture --directory build --output-file coverage.info
+        # 1. Capture the data (FIXED: Added --ignore-errors mismatch)
+        lcov --capture --directory build --output-file coverage.info --ignore-errors mismatch
         
         # 2. Remove clutter (system files and Google Test library code)
-        lcov --remove coverage.info '/usr/*' '*/_deps/*' --output-file coverage_filtered.info
+        lcov --remove coverage.info '/usr/*' '*/_deps/*' --output-file coverage_filtered.info --ignore-errors mismatch
         
         # 3. Generate HTML
-        genhtml coverage_filtered.info --output-directory coverage_report
+        genhtml coverage_filtered.info --output-directory coverage_report --ignore-errors mismatch
 
     - name: Upload Coverage Report
-      # CHANGED: Updated from v3 to v4 (This fixes your error)
       uses: actions/upload-artifact@v4
       with:
         name: coverage-report
