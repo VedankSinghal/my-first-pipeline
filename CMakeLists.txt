@@ -1,16 +1,30 @@
-cmake_minimum_required(VERSION 3.10)
-project(MyTestProject)
+cmake_minimum_required(VERSION 3.14)
+project(GoogleTestExample)
 
-# 1. Enable Coverage Flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
-
-# 2. Standard Setup
 set(CMAKE_CXX_STANDARD 14)
 
-find_package(GTest REQUIRED)
-include_directories(${GTEST_INCLUDE_DIRS})
+# ---------------------------------------------------------
+# Part A: Download Google Test from the Internet
+# (This fixes the "Could NOT find GTest" error)
+# ---------------------------------------------------------
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+)
+# This compiles Google Test for you
+FetchContent_MakeAvailable(googletest)
 
-# 3. Create the executable (Only once!)
+# ---------------------------------------------------------
+# Part B: Your Application
+# ---------------------------------------------------------
+# Create the executable from your main file
 add_executable(run_tests main.cpp)
 
-target_link_libraries(run_tests gtest gtest_main pthread)
+# Link your program to the Google Test library
+# If you used the code I gave you with main(), use GTest::gtest
+target_link_libraries(run_tests GTest::gtest)
+
+# Enable Testing
+enable_testing()
+add_test(NAME MyMathTest COMMAND run_tests)
