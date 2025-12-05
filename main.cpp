@@ -18,7 +18,7 @@ TEST(ErrorHandling, DivideNormally) {
     EXPECT_NO_THROW(divide(10, 2));
 }
 
-TEST(ErrorHandling, DivideNormally) {
+TEST(ErrorHandling, Dividebyzero) {
     // This should NOT throw anything
     EXPECT_NO_THROW(divide(10, 0));
 }
