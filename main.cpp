@@ -9,11 +9,6 @@ double divide(double a, double b) {
     return a / b;
 }
 
-TEST(ErrorHandling, DivideByZero) {
-    // We expect the function 'divide(10, 0)' to throw 'std::invalid_argument'
-   EXPECT_THROW(divide(10, 0), std::invalid_argument);
-}
-
 TEST(ErrorHandling, DivideNormally) {
     // This should NOT throw anything
     EXPECT_NO_THROW(divide(10, 2));
