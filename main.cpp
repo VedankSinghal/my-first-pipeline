@@ -8,6 +8,10 @@ double divide(double a, double b) {
     }
     return a / b;
 }
+int sum(int c, int d) {
+    int e=c+d;
+    return e;
+}
 
 TEST(ErrorHandling, DivideNormally) {
     // This should NOT throw anything
