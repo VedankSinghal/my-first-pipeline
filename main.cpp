@@ -17,6 +17,11 @@ TEST(ErrorHandling, DivideNormally) {
     // This should NOT throw anything
     EXPECT_NO_THROW(divide(10, 2));
 }
+
+TEST(ErrorHandling, DivideNormally) {
+    // This should NOT throw anything
+    EXPECT_NO_THROW(divide(10, 0));
+}
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
