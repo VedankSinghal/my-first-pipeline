@@ -3,7 +3,7 @@
 
 // A risky function
 double divide(double a, double b) {
-    (b == 0) {
+    if (b == 0) {
         throw std::invalid_argument("Cannot divide by zero!");
     }
     return a / b;
