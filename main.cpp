@@ -13,9 +13,9 @@ int sum(int c, int d) {
     return e;
 }
 
-TEST(ErrorHandling, Dividebyzero) {
-    // This should NOT throw anything
-    EXPECT_THROW(divide(10, 0));
+TEST(ErrorHandling, DivideByZero) {
+    // We expect the function 'divide(10, 0)' to throw 'std::invalid_argument'
+    EXPECT_THROW(divide(10, 0), std::invalid_argument);
 }
 
 TEST(ErrorHandling, DivideNormally) {
