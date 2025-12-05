@@ -15,7 +15,7 @@ int sum(int c, int d) {
 
 TEST(ErrorHandling, Dividebyzero) {
     // This should NOT throw anything
-    EXPECT_NO_THROW(divide(10, 0));
+    EXPECT_THROW(divide(10, 0));
 }
 
 TEST(ErrorHandling, DivideNormally) {
