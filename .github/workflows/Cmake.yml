@@ -1,4 +1,4 @@
-name: C++ Coverage Report
+name: C++ CI with Auto-Tagging
 
 on:
   push:
@@ -8,14 +8,19 @@ on:
   schedule:
     - cron: '*/30 * * * *'
 
+# IMPORTANT: This gives the pipeline permission to write tags to your repo
+permissions:
+  contents: write
+
 jobs:
-  build-test-coverage:
+  build-test-tag:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
 
+    # [Standard Setup Steps...]
     - name: Install LCOV
       run: |
         sudo apt-get update
@@ -30,15 +35,11 @@ jobs:
     - name: Run Tests
       run: ./build/run_tests
 
+    # [Standard Coverage Steps...]
     - name: Generate LCOV Report
       run: |
-        # 1. Capture the data (FIXED: Added --ignore-errors mismatch)
         lcov --capture --directory build --output-file coverage.info --ignore-errors mismatch
-        
-        # 2. Remove clutter (system files and Google Test library code)
         lcov --remove coverage.info '/usr/*' '*/_deps/*' --output-file coverage_filtered.info --ignore-errors mismatch
-        
-        # 3. Generate HTML
         genhtml coverage_filtered.info --output-directory coverage_report --ignore-errors mismatch
 
     - name: Upload Coverage Report
@@ -46,3 +47,18 @@ jobs:
       with:
         name: coverage-report
         path: coverage_report
+
+    # --- NEW PART START ---
+    # This step creates a tag like "build-15" and pushes it to your repo
+    - name: Tag the Commit
+      if: success()  # Only tag if tests PASSED
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        
+        # Create a tag named "build-X" where X is the run number
+        git tag -a "build-${{ github.run_number }}" -m "Automated build number ${{ github.run_number }}"
+        
+        # Push the tag to the repository
+        git push origin "build-${{ github.run_number }}"
+    # --- NEW PART END ---
